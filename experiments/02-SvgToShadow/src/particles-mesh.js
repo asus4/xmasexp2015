@@ -1,42 +1,51 @@
 /* global THREE */
 
-export default class ParticlesMesh extends THREE.Mesh {
-  constructor() {
-    let geometry = new THREE.Geometry()
+const SCALE = 30
+
+class ShadowGeometry extends THREE.Geometry {
+
+  constructor(lightPosition) {
+    super()
+    this.lightPosition = lightPosition
+    console.log(lightPosition)
+
     let cube = new THREE.CubeGeometry(1, 1, 1, 1, 1, 1)
-    let sphere = new THREE.SphereGeometry(0.5)
+    let sphere = new THREE.SphereGeometry(0.5, 16, 12)
 
-    let random3d = (s, offset = 0) => {
-      return new THREE.Vector3(
-        s * Math.random() + offset,
-        s * Math.random() + offset,
-        s * Math.random() + offset)
+    let count = 0
+    for (let y = -1; y <= 1; y += 0.2) {
+      for (let x = -1; x <= 1; x += 0.2) {
+        count++
+        if (count % 2 == 0) {
+          this.merge(cube, this.calc3DSpace(x, y, (count % 3 + 1)))
+        } else {
+          this.merge(sphere, this.calc3DSpace(x, y, (count % 3 + 1)))
+        }
+      }
     }
-    let randomRot3d = (s, offset = 0) => {
-      return new THREE.Euler(
-        s * Math.random() + offset,
-        s * Math.random() + offset,
-        s * Math.random() + offset)
-    }
+  }
 
-    let mat = new THREE.Matrix4()
-    let quaternion = new THREE.Quaternion()
+  calc3DSpace(x, y, size) {
+    let p = new THREE.Vector3(
+      x * SCALE,
+      0,
+      y * SCALE
+    )
 
-    for (let i = 0; i < 50; i++) {
-      let pos = random3d(20, -10)
-      let rot = randomRot3d(2 * Math.PI)
-      let scale = random3d(2.0, 1.0)
-      quaternion.setFromEuler(rot, false)
-      geometry.merge(cube, mat.compose(pos, quaternion, scale))
+    // let pos = new THREE.Vector3(x, y, size).multiplyScalar(10)
+    // let rot = new THREE.Quaternion()
+    // let scale = new THREE.Vector3(1, 1, 1)
+    let mat = new THREE.Matrix4().identity()
+    // return mat.makeTranslation(x * 10, y * 10 + 15, (size - 1.5) * 10)
+    return mat.makeTranslation(p.x, p.y, p.z)
+  // return mat.compose(pos, rot, scale)
+  }
+}
 
-      pos = random3d(20, -10)
-      rot = randomRot3d(2 * Math.PI)
-      scale = random3d(2.0, 1.0)
-      quaternion.setFromEuler(rot, false)
-      geometry.merge(sphere, mat.compose(pos, quaternion, scale))
-    }
+export default class ParticlesMesh extends THREE.Mesh {
+  constructor(lightPosition) {
     super(
-      geometry,
+      new ShadowGeometry(lightPosition),
       new THREE.MeshPhongMaterial({
         color: 0xfff5f5
       })

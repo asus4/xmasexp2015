@@ -85,8 +85,8 @@ class App {
     ground.receiveShadow = true
     this.scene.add(ground)
 
-    let mesh = new ParticlesMesh()
-    mesh.position.set(0, 15, 30)
+    let mesh = new ParticlesMesh(this.light.position)
+    // mesh.position.set(0, 15, 0)
     mesh.castShadow = true
     mesh.receiveShadow = true
     this.scene.add(mesh)
