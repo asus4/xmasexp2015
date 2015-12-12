@@ -4,9 +4,11 @@ import 'babel-core/polyfill'
 import './main.styl'
 import dat from 'dat-gui'
 import 'OrbitControls'
+import ParticlesMesh from './particles-mesh'
 
 document.body.innerHTML = require('./body.jade')()
 const gui = new dat.gui.GUI()
+console.log(gui)
 
 class App {
   constructor() {
@@ -17,25 +19,27 @@ class App {
   }
 
   initScene() {
-    this.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 3000)
-    this.camera.position.set(700, 50, 1900)
+    const FAR = 1000
+
+    this.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, FAR)
+    this.camera.position.set(0, 150, 30)
 
     // SCENE
     this.scene = new THREE.Scene()
-    this.scene.fog = new THREE.Fog(0x59472b, 1000, 3000)
+    this.scene.fog = new THREE.Fog(0xebf5ff, 100, FAR)
 
     // LIGHTS
     let ambient = new THREE.AmbientLight(0x444444)
     this.scene.add(ambient)
 
-    let light = new THREE.SpotLight(0xffffff, 1, 0, Math.PI / 2, 1)
-    light.position.set(0, 1500, 1000)
+    let light = new THREE.SpotLight(0xffffff, 1, 0, Math.PI * 0.4, 1)
+    light.position.set(0, 50, 80)
     light.target.position.set(0, 0, 0)
 
     light.castShadow = true
 
-    light.shadowCameraNear = 1200
-    light.shadowCameraFar = 2500
+    light.shadowCameraNear = 1
+    light.shadowCameraFar = 250
     light.shadowCameraFov = 50
 
     // light.shadowCameraVisible = true
@@ -70,28 +74,27 @@ class App {
     // GROUND
     let geometry = new THREE.PlaneBufferGeometry(100, 100)
     let planeMaterial = new THREE.MeshPhongMaterial({
-      color: 0xffdd99
+      color: 0xfff5f5
     })
     let ground = new THREE.Mesh(geometry, planeMaterial)
     ground.position.set(0, 0, 0)
     ground.rotation.x = -Math.PI / 2
-    ground.scale.set(100, 100, 100)
+    ground.scale.set(10, 10, 10)
     ground.castShadow = false
     ground.receiveShadow = true
     this.scene.add(ground)
 
-    let mesh = new THREE.Mesh(new THREE.BoxGeometry(1600, 170, 250), planeMaterial)
-    mesh.position.set(0, 200, 20)
+    let mesh = new ParticlesMesh()
+    mesh.position.set(0, 15, 30)
     mesh.castShadow = true
     mesh.receiveShadow = true
     this.scene.add(mesh)
   }
 
   animate(t) {
-    // console.log(t)
     requestAnimationFrame(this.animate)
 
-    this.controls.update()
+    this.controls.update(t)
     this.renderer.clear()
     this.renderer.render(this.scene, this.camera)
   }
