@@ -1,8 +1,8 @@
 /* global THREE */
 
-import 'babel-core/polyfill'
+//import 'babel-core/polyfill'
 import Stats from 'stats.js'
-import dat from 'dat-gui'
+// import dat from 'dat-gui'
 import 'OrbitControls'
 
 import './main.styl'
@@ -10,8 +10,7 @@ import ParticlesMesh from './particles-mesh'
 
 
 document.body.innerHTML = require('./body.jade')()
-const gui = new dat.gui.GUI()
-console.log(gui)
+// const gui = new dat.gui.GUI()
 
 class App {
   constructor() {
@@ -37,7 +36,7 @@ class App {
     this.scene.add(ambient)
 
     let light = new THREE.SpotLight(0xffffff, 1, 0, Math.PI * 0.4, 1)
-    light.position.set(0, 40, 80)
+    light.position.set(0, 30, 90)
     light.target.position.set(0, 0, 0)
 
     light.castShadow = true
@@ -99,7 +98,6 @@ class App {
     this.stats.domElement.style.position = 'absolute'
     this.stats.domElement.style.top = '0px'
     document.body.appendChild(this.stats.domElement)
-
   }
 
   animate(t) {
