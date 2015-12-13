@@ -3,14 +3,15 @@
 //import 'babel-core/polyfill'
 import Stats from 'stats.js'
 // import dat from 'dat-gui'
+// const gui = new dat.gui.GUI()
 import 'OrbitControls'
 
 import './main.styl'
 import ParticlesMesh from './particles-mesh'
-
+import Snow from './snow'
 
 document.body.innerHTML = require('./body.jade')()
-// const gui = new dat.gui.GUI()
+
 
 class App {
   constructor() {
@@ -29,13 +30,13 @@ class App {
 
     // SCENE
     this.scene = new THREE.Scene()
-    this.scene.fog = new THREE.Fog(0xebf5ff, 100, FAR)
+    this.scene.fog = new THREE.Fog(0x12293b, 100, FAR)
 
     // LIGHTS
-    let ambient = new THREE.AmbientLight(0x444444)
+    let ambient = new THREE.AmbientLight(0x555555)
     this.scene.add(ambient)
 
-    let light = new THREE.SpotLight(0xffffff, 1, 0, Math.PI * 0.4, 1)
+    let light = new THREE.SpotLight(0xffffff, 0.7, 0, Math.PI * 0.4, 1)
     light.position.set(0, 30, 90)
     light.target.position.set(0, 0, 0)
 
@@ -52,7 +53,7 @@ class App {
 
     // RENDERER
     this.renderer = new THREE.WebGLRenderer({
-      antialias: true
+      antialias: false
     })
     this.renderer.setClearColor(this.scene.fog.color)
     this.renderer.setPixelRatio(window.devicePixelRatio)
@@ -84,11 +85,16 @@ class App {
     ground.receiveShadow = true
     this.scene.add(ground)
 
+    // Cubes
     let mesh = new ParticlesMesh(this.light.position)
-    // mesh.position.set(0, 15, 0)
+    mesh.position.set(0, -0.8, 0)
     mesh.castShadow = true
     mesh.receiveShadow = true
     this.scene.add(mesh)
+
+    // Snow
+    this.snow = new Snow()
+    this.scene.add(this.snow)
   }
 
   initDebug() {
@@ -102,8 +108,11 @@ class App {
 
   animate(t) {
     requestAnimationFrame(this.animate)
-    this.controls.update(t)
     this.renderer.clear()
+
+    this.controls.update(t)
+    this.snow.update(t)
+
     this.renderer.render(this.scene, this.camera)
 
     this.stats.update()

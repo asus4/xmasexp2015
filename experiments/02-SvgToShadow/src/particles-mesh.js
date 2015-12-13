@@ -13,21 +13,18 @@ class ShadowGeometry extends THREE.Geometry {
     this.light = [lightPosition.x, lightPosition.y, lightPosition.z]
 
     let cube = new THREE.CubeGeometry(1, 1, 1, 1, 1, 1)
-    let sphere = new THREE.SphereGeometry(0.5, 16, 12)
+    // let sphere = new THREE.SphereGeometry(0.5, 16, 12)
 
+    const STEP = 0.05
     let count = 0
-    for (let y = -1; y <= 1; y += 0.1) {
-      for (let x = -1; x <= 1; x += 0.1) {
+    for (let y = -1; y <= 1; y += STEP) {
+      for (let x = -1; x <= 1; x += STEP) {
+        this.merge(cube, this.calc3DSpace(x, y, (Math.random() * 2.0)))
+        // this.merge(cube, this.calc3DSpace(x, y, 0))
         count++
-        count = 0.5
-        if (count % 2 == 0) {
-          this.merge(cube, this.calc3DSpace(x, y, (count % 7 + 1)))
-        } else {
-          this.merge(cube, this.calc3DSpace(x, y, (count % 7 + 1)))
-        // this.merge(sphere, this.calc3DSpace(x, y, (count % 7 * 0.5 + 1)))
-        }
       }
     }
+    console.log(`count:${count}  verts:${this.vertices.length}`)
   }
 
   calc3DSpace(x, y, size) {
@@ -36,7 +33,7 @@ class ShadowGeometry extends THREE.Geometry {
     let p = [x * SCALE, 0, y * SCALE]
     vec3.lerp(p, this.light, p, 1 / size)
 
-    let d = vec3.distance(p, this.light)
+    // let d = vec3.distance(p, this.light)
 
     let rot = quat.rotationTo([],
       vec3.normalize([], p),
