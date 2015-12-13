@@ -9,10 +9,10 @@ export default class Snow extends THREE.Points {
       props.count = 10000
     }
     if (props.gravity == undefined) {
-      props.gravity = 0.0003
+      props.gravity = 0.001
     }
     if (props.turbulence == undefined) {
-      props.turbulence = new THREE.Vector3(0.002, 0, 0.002)
+      props.turbulence = new THREE.Vector3(0.008, 0, 0.008)
     }
 
     super(
@@ -59,18 +59,22 @@ export default class Snow extends THREE.Points {
   }
 
   update(time) {
-    this.rotation.y = time * 0.0001
+    //  this.rotation.y = time * 0.0001
 
     let position = this.geometry.attributes.position.array
     let velocity = this._velocity
     for (let i = 0; i < this.count; i += 3) {
       if (position[i + 1] < 0) {
+        position[i] = Math.random() * this.area * 2 - this.area
         position[i + 1] = this.area
+        position[i + 2] = Math.random() * this.area * 2 - this.area
+        velocity[i] = 0
         velocity[i + 1] = -Math.random() * this.gravity
+        velocity[i + 2] = 0
       }
       velocity[i] += (Math.random() - 0.5) * this.turbulence.x
       velocity[i + 1] += (Math.random() - 0.5) * this.turbulence.y + Math.random() * this.gravity
-      velocity[i + 2] += (Math.random() - 0.5) * this.turbulence.z
+      velocity[i + 2] += (Math.random() - 0.5) * this.turbulence.z + Math.random() * this.gravity
       position[i] += velocity[i]
       position[i + 1] -= velocity[i + 1]
       position[i + 2] += velocity[i + 2]
