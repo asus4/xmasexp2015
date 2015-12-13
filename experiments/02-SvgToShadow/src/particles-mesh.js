@@ -23,9 +23,9 @@ class Cube {
     vec3.subtract(this.velocity, this.morphs[index].pos, this.pos)
     vec3.scale(this.velocity, this.velocity, 0.1)
 
-    this.velocity[0] += (Math.random() - 0.5) * 0.01
-    this.velocity[1] += (Math.random() - 0.5) * 0.01
-    this.velocity[2] += (Math.random() - 0.5) * 0.01
+    this.velocity[0] += (Math.random() - 0.5) * 0.05
+    this.velocity[1] += (Math.random() - 0.5) * 0.05
+    this.velocity[2] += (Math.random() - 0.5) * 0.05
     // transpose
     return {
       pos: vec3.add(this.pos, this.pos, this.velocity),
@@ -60,7 +60,7 @@ class ShadowGeometry extends THREE.Geometry {
 
       let x = (i % SIZE * 2 - SIZE) * 0.05
       let y = (i / SIZE * 2 - SIZE) * 0.05
-      let t = this.get3DTransform(x, y, 2)
+      let t = this.get3DTransform(x, y, 1)
       let cube = new Cube()
       cube.addMorph(t)
       this.cubes.push(cube)
@@ -69,6 +69,7 @@ class ShadowGeometry extends THREE.Geometry {
     // this.fromGeometry(geometry)
     this.imageToMorph('./textures/frame2.png', this.cubes)
     this.imageToMorph('./textures/frame3.png', this.cubes)
+    this.imageToMorph('./textures/frame4.png', this.cubes)
   }
 
   imageToMorph(src, cubes) {
@@ -84,8 +85,6 @@ class ShadowGeometry extends THREE.Geometry {
 
       let pixels = ctx.getImageData(0, 0, img.width, img.height).data
       let len = img.width * img.height
-      console.log(len)
-      console.log(cubes.length)
 
       for (let i = 0; i < len; i++) {
         let x = (i % SIZE * 2 - SIZE) * 0.05

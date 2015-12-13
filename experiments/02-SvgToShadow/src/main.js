@@ -105,7 +105,7 @@ class App {
     document.body.appendChild(this.stats.domElement)
 
     this.gui = new dat.gui.GUI()
-    this.gui.add(this.particle.geometry, 'morphIndex', 0, 2)
+    this.gui.add(this.particle.geometry, 'morphIndex', 0, 3)
   }
 
   animate(t) {
