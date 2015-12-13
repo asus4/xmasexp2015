@@ -9,53 +9,72 @@ export default class Snow extends THREE.Points {
       props.count = 10000
     }
     if (props.gravity == undefined) {
-      props.gravity = 0.0001
+      props.gravity = 0.0005
     }
     if (props.turbulence == undefined) {
-      props.turbulence = new THREE.Vector3(0.001, 0, 0.001)
-    }
-
-    let geometry = new THREE.Geometry()
-    for (let i = 0; i < props.count; ++i) {
-      let v = new THREE.Vector3(
-        Math.random() * props.area * 2 - props.area,
-        Math.random() * props.area * 2,
-        Math.random() * props.area * 2 - props.area
-      )
-      v.velocity = new THREE.Vector3(0, 0, 0)
-      geometry.vertices.push(v)
+      props.turbulence = new THREE.Vector3(0.002, 0, 0.002)
     }
 
     super(
-      geometry,
-      new THREE.PointsMaterial({
-        size: 1,
-        map: THREE.ImageUtils.loadTexture('./textures/snow.png'),
+      new THREE.BufferGeometry(),
+      new THREE.ShaderMaterial({
+        vertexShader: require('./shaders/default.vert'),
+        fragmentShader: require('./shaders/particle.frag'),
+        uniforms: {
+          size: {
+            type: 'f',
+            value: 2.0
+          },
+          color: {
+            type: 'v4',
+            value: new THREE.Vector4(1, 1, 1, 0.5)
+          },
+          texture: {
+            type: 't',
+            value: THREE.ImageUtils.loadTexture('./textures/snow.png')
+          }
+        },
         blending: THREE.AdditiveBlending,
         depthTest: false,
         transparent: true
       })
     )
+
+    this.count = props.count
     this.area = props.area
     this.gravity = props.gravity
     this.turbulence = props.turbulence
+
+    let positions = new Float32Array(props.count * 3)
+    let velocity = new Float32Array(props.count * 3)
+    for (let i = 0; i < props.count; i += 3) {
+      positions[i] = Math.random() * props.area * 2 - props.area,
+      positions[i + 1] = Math.random() * props.area * 2
+      positions[i + 2] = Math.random() * props.area * 2 - props.area
+    }
+
+    let buffer = new THREE.BufferAttribute(positions, 3, 0).setDynamic(true)
+    this.geometry.addAttribute('position', buffer)
+    this._velocity = velocity
   }
 
   update() {
-    this.rotation.y += 0.001
+    this.rotation.y += 0.0005
 
-    let vertices = this.geometry.vertices
-    vertices.forEach((v) => {
-      if (v.y < 0) {
-        v.y = this.area
-        v.velocity.y = -Math.random() * this.gravity
+    let position = this.geometry.attributes.position.array
+    let velocity = this._velocity
+    for (let i = 0; i < this.count; i += 3) {
+      if (position[i + 1] < 0) {
+        position[i + 1] = this.area
+        velocity[i + 1] = -Math.random() * this.gravity
       }
-
-      v.velocity.x += (Math.random() - 0.5) * this.turbulence.x
-      v.velocity.y += (Math.random() - 0.5) * this.turbulence.y - Math.random() * this.gravity
-      v.velocity.z += (Math.random() - 0.5) * this.turbulence.z
-      v.add(v.velocity)
-    })
-    this.geometry.verticesNeedUpdate = true
+      velocity[i] += (Math.random() - 0.5) * this.turbulence.x
+      velocity[i + 1] += (Math.random() - 0.5) * this.turbulence.y + Math.random() * this.gravity
+      velocity[i + 2] += (Math.random() - 0.5) * this.turbulence.z
+      position[i] += velocity[i]
+      position[i + 1] -= velocity[i + 1]
+      position[i + 2] += velocity[i + 2]
+    }
+    this.geometry.attributes.position.needsUpdate = true
   }
 }

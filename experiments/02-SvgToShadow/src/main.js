@@ -12,7 +12,6 @@ import Snow from './snow'
 
 document.body.innerHTML = require('./body.jade')()
 
-
 class App {
   constructor() {
     this.animate = this.animate.bind(this)
@@ -23,14 +22,14 @@ class App {
   }
 
   initScene() {
-    const FAR = 800
+    const FAR = 400
 
     this.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, FAR)
     this.camera.position.set(0, 150, 30)
 
     // SCENE
     this.scene = new THREE.Scene()
-    this.scene.fog = new THREE.Fog(0x12293b, 100, FAR)
+    this.scene.fog = new THREE.Fog(0x12293b, 30, FAR)
 
     // LIGHTS
     let ambient = new THREE.AmbientLight(0x555555)
@@ -123,8 +122,7 @@ class App {
     this.camera.updateProjectionMatrix()
     this.renderer.setSize(window.innerWidth, window.innerHeight)
   }
-
-
 }
 
 new App()
+console.log('%c ❄❅❆ Christmas ☃ Experiments ❄❅❆ ', 'color:#fff;background:#12293b;font-size:30px;font-weight:bold;')
