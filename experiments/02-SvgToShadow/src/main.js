@@ -2,8 +2,7 @@
 
 //import 'babel-core/polyfill'
 import Stats from 'stats.js'
-// import dat from 'dat-gui'
-// const gui = new dat.gui.GUI()
+import dat from 'dat-gui'
 import 'OrbitControls'
 
 import './main.styl'
@@ -85,11 +84,12 @@ class App {
     this.scene.add(ground)
 
     // Cubes
-    let mesh = new ParticlesMesh(this.light.position)
-    mesh.position.set(0, -0.8, 0)
-    mesh.castShadow = true
-    mesh.receiveShadow = true
-    this.scene.add(mesh)
+    let particle = new ParticlesMesh(this.light.position)
+    particle.position.set(0, -1, 0)
+    particle.castShadow = true
+    particle.receiveShadow = true
+    this.scene.add(particle)
+    this.particle = particle
 
     // Snow
     this.snow = new Snow()
@@ -103,14 +103,18 @@ class App {
     this.stats.domElement.style.position = 'absolute'
     this.stats.domElement.style.top = '0px'
     document.body.appendChild(this.stats.domElement)
+
+    this.gui = new dat.gui.GUI()
+    this.gui.add(this.particle.geometry, 'morphIndex', 0, 2)
   }
 
   animate(t) {
     requestAnimationFrame(this.animate)
     this.renderer.clear()
 
-    this.controls.update(t)
+    this.controls.update()
     this.snow.update(t)
+    this.particle.update(t)
 
     this.renderer.render(this.scene, this.camera)
 
@@ -125,4 +129,4 @@ class App {
 }
 
 new App()
-console.log('%c ❄❅❆ Christmas ☃ Experiments ❄❅❆ ', 'color:#fff;background:#12293b;font-size:30px;font-weight:bold;')
+console.log('%c ❄❆❅ Merry ☃ Christmas ❅❆❄ ', 'color:#fff;background:#12293b;font-size:30px;font-weight:bold;')
