@@ -3,6 +3,7 @@
 //import 'babel-core/polyfill'
 import Stats from 'stats.js'
 import dat from 'dat-gui'
+import TWEEN from 'tween.js'
 import 'OrbitControls'
 
 import './main.styl'
@@ -104,12 +105,34 @@ class App {
     this.stats.domElement.style.top = '0px'
     document.body.appendChild(this.stats.domElement)
 
+
+    this.tweenTime = 3000
     this.gui = new dat.gui.GUI()
     this.gui.add(this.particle.geometry, 'morphIndex', 0, 3)
+    this.gui.add(this, 'tweenTime', 1000, 10000)
+    this.gui.add(this, 'bang')
+  }
+
+  bang() {
+    let p = {
+      t: 0
+    }
+    let tween = new TWEEN.Tween(p)
+    tween.to({
+      t: 3.99
+    }, this.tweenTime)
+    tween.onUpdate(() => {
+      this.particle.geometry.morphIndex = p.t
+    })
+    tween.onComplete(() => {
+      this.bang()
+    })
+    tween.start()
   }
 
   animate(t) {
     requestAnimationFrame(this.animate)
+    TWEEN.update(t)
     this.renderer.clear()
 
     this.controls.update()
@@ -129,4 +152,4 @@ class App {
 }
 
 new App()
-console.log('%c ❄❆❅ Merry ☃ Christmas ❅❆❄ ', 'color:#fff;background:#12293b;font-size:30px;font-weight:bold;')
+console.log('%c ❄❆❅ ☃ ❅❆❄ ', 'color:#fff;background:#12293b;font-size:30px;font-weight:bold;')

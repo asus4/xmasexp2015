@@ -23,9 +23,9 @@ class Cube {
     vec3.subtract(this.velocity, this.morphs[index].pos, this.pos)
     vec3.scale(this.velocity, this.velocity, 0.1)
 
-    this.velocity[0] += (Math.random() - 0.5) * 0.05
-    this.velocity[1] += (Math.random() - 0.5) * 0.05
-    this.velocity[2] += (Math.random() - 0.5) * 0.05
+    this.velocity[0] += (Math.random() - 0.5) * 0.02
+    this.velocity[1] += (Math.random() - 0.5) * 0.02
+    this.velocity[2] += (Math.random() - 0.5) * 0.02
     // transpose
     return {
       pos: vec3.add(this.pos, this.pos, this.velocity),
