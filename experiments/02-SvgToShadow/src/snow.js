@@ -9,7 +9,7 @@ export default class Snow extends THREE.Points {
       props.count = 10000
     }
     if (props.gravity == undefined) {
-      props.gravity = 0.0005
+      props.gravity = 0.0003
     }
     if (props.turbulence == undefined) {
       props.turbulence = new THREE.Vector3(0.002, 0, 0.002)
@@ -58,8 +58,8 @@ export default class Snow extends THREE.Points {
     this._velocity = velocity
   }
 
-  update() {
-    this.rotation.y += 0.0005
+  update(time) {
+    this.rotation.y = time * 0.0001
 
     let position = this.geometry.attributes.position.array
     let velocity = this._velocity
