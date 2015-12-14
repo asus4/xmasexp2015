@@ -21,8 +21,10 @@ class App {
     this.animate = this.animate.bind(this)
     this.initScene()
     this.initObjects()
-    this.initDebug()
+    // this.initDebug()
     this.animate()
+
+    this.start()
   }
 
   initScene() {
@@ -40,7 +42,7 @@ class App {
     this.scene.add(ambient)
 
     let light = new THREE.SpotLight(0xffffff, 0.7, 0, Math.PI * 0.4, 1)
-    light.position.set(0, 30, 90)
+    light.position.set(0, 40, 90)
     light.target.position.set(0, 0, 0)
 
     light.castShadow = true
@@ -85,8 +87,13 @@ class App {
     this.scene.add(this.ground)
 
     // Cubes
-    let particle = new ParticlesMesh(this.light.position, loader.getResult('stripe'))
-    particle.position.set(0, -1, 0)
+    let frames = []
+    for (let i = 0; i < 24; i++) {
+      frames.push(loader.getResult(`frame${i}`))
+    }
+
+    let particle = new ParticlesMesh(this.light.position, loader.getResult('stripe'), frames)
+    particle.position.set(0, -1.4, 0)
     particle.castShadow = true
     particle.receiveShadow = true
     this.scene.add(particle)
@@ -99,22 +106,20 @@ class App {
 
   initDebug() {
     // this.scene.add(new THREE.CameraHelper(this.light.shadow.camera))
-
     this.stats = new Stats()
     this.stats.domElement.style.position = 'absolute'
     this.stats.domElement.style.top = '0px'
     document.body.appendChild(this.stats.domElement)
 
-
     this.tweenTime = 1000
     this.gui = new dat.gui.GUI()
     this.gui.add(this.particle.geometry, 'morphIndex', 0, 4)
     this.gui.add(this, 'tweenTime', 500, 10000)
-    this.gui.add(this, 'bang')
-    this.gui.add(this.particle.position, 'y', -1.1, 1.1)
+    // this.gui.add(this, 'start')
+    this.gui.add(this.particle.position, 'y', -2.0, 2.0)
   }
 
-  bang() {
+  start() {
     let p = {
       t: 1
     }
@@ -126,7 +131,7 @@ class App {
       this.particle.geometry.morphIndex = p.t
     })
     tween.onComplete(() => {
-      this.bang()
+      this.start()
     })
     tween.start()
   }
@@ -143,7 +148,10 @@ class App {
 
     this.renderer.render(this.scene, this.camera)
 
-    this.stats.update()
+    if (this.stats) {
+      this.stats.update()
+    }
+
   }
 
   onResize() {

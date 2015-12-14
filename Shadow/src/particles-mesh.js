@@ -41,7 +41,7 @@ Cube.geometry = new THREE.BoxGeometry(1, 1, 1, 1, 1, 1).vertices.map((v) => {
 // class ShadowGeometry extends THREE.BufferGeometry {
 class ShadowGeometry extends THREE.Geometry {
 
-  constructor(lightPosition) {
+  constructor(lightPosition, frames) {
     super()
     this.morphIndex = 0
     this.light = [lightPosition.x, lightPosition.y, lightPosition.z]
@@ -66,40 +66,29 @@ class ShadowGeometry extends THREE.Geometry {
       this.cubes.push(cube)
     }
 
-    // this.fromGeometry(geometry)
-
-    for (let i = 0; i < 24; i++) {
-      this.imageToMorph(`./textures/deer/${i}.png`, this.cubes)
-    }
-
-  // this.imageToMorph('./textures/frame3.png', this.cubes)
-  // this.imageToMorph('./textures/frame4.png', this.cubes)
-  // this.imageToMorph('./textures/frame5.png', this.cubes)
+    frames.forEach((frame) => {
+      this.imageToMorph(frame, this.cubes)
+    })
   }
 
-  imageToMorph(src, cubes) {
-    let img = new Image()
+  imageToMorph(img, cubes) {
+    let canvas = document.createElement('canvas')
+    canvas.width = img.width
+    canvas.height = img.height
 
-    img.onload = () => {
-      let canvas = document.createElement('canvas')
-      canvas.width = img.width
-      canvas.height = img.height
+    let ctx = canvas.getContext('2d')
+    ctx.drawImage(img, 0, 0, img.width, img.height)
 
-      let ctx = canvas.getContext('2d')
-      ctx.drawImage(img, 0, 0, img.width, img.height)
+    let pixels = ctx.getImageData(0, 0, img.width, img.height).data
+    let len = img.width * img.height
 
-      let pixels = ctx.getImageData(0, 0, img.width, img.height).data
-      let len = img.width * img.height
-
-      for (let i = 0; i < len; i++) {
-        let x = (i % SIZE * 2 - SIZE) * 0.05
-        let y = (i / SIZE * 2 - SIZE) * 0.05
-        let t = this.get3DTransform(x, y, pixels[i * 4] * 0.008)
-        cubes[i].addMorph(t)
-      // console.log(`[${x},${y}] = ${pixels[i * 4]}`)
-      }
+    for (let i = 0; i < len; i++) {
+      let x = (i % SIZE * 2 - SIZE) * 0.05
+      let y = (i / SIZE * 2 - SIZE) * 0.05
+      let t = this.get3DTransform(x, y, pixels[i * 4] * 0.008)
+      cubes[i].addMorph(t)
+    // console.log(`[${x},${y}] = ${pixels[i * 4]}`)
     }
-    img.src = src
   }
 
   get3DTransform(x, y, size) {
@@ -141,11 +130,11 @@ class ShadowGeometry extends THREE.Geometry {
 }
 
 export default class ParticlesMesh extends THREE.Mesh {
-  constructor(lightPosition, image) {
-    let tex = new THREE.Texture(image)
+  constructor(lightPosition, texImage, frames) {
+    let tex = new THREE.Texture(texImage)
     tex.needsUpdate = true
 
-    super(new ShadowGeometry(lightPosition),
+    super(new ShadowGeometry(lightPosition, frames),
       new THREE.MeshPhongMaterial({
         map: tex
       })
