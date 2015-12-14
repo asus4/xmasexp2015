@@ -1,7 +1,7 @@
 /* global THREE */
 
 export default class Snow extends THREE.Points {
-  constructor(props = {}) {
+  constructor(image, props = {}) {
     if (props.area == undefined) {
       props.area = 100
     }
@@ -14,7 +14,8 @@ export default class Snow extends THREE.Points {
     if (props.turbulence == undefined) {
       props.turbulence = new THREE.Vector3(0.008, 0, 0.008)
     }
-
+    let tex = new THREE.Texture(image)
+    tex.needsUpdate = true
     super(
       new THREE.BufferGeometry(),
       new THREE.ShaderMaterial({
@@ -31,7 +32,7 @@ export default class Snow extends THREE.Points {
           },
           texture: {
             type: 't',
-            value: THREE.ImageUtils.loadTexture('./textures/snow.png')
+            value: tex
           }
         },
         blending: THREE.AdditiveBlending,
@@ -58,9 +59,7 @@ export default class Snow extends THREE.Points {
     this._velocity = velocity
   }
 
-  update(time) {
-    //  this.rotation.y = time * 0.0001
-
+  update() {
     let position = this.geometry.attributes.position.array
     let velocity = this._velocity
     for (let i = 0; i < this.count; i += 3) {

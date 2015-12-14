@@ -1,14 +1,18 @@
 /* global THREE */
 
-//import 'babel-core/polyfill'
 import Stats from 'stats.js'
 import dat from 'dat-gui'
 import TWEEN from 'tween.js'
 import 'OrbitControls'
+import loader from './preloader'
 
 import './main.styl'
 import ParticlesMesh from './particles-mesh'
 import Snow from './snow'
+import SnowGround from './snow-ground'
+
+
+
 
 document.body.innerHTML = require('./body.jade')()
 
@@ -67,25 +71,21 @@ class App {
     document.body.appendChild(this.renderer.domElement)
 
     this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement)
+    this.controls.autoRotate = true
+    this.controls.autoRotateSpeed = 2.0
+    this.controls.maxPolarAngle = Math.PI * 0.45
     window.addEventListener('resize', this.onResize.bind(this))
   }
 
   initObjects() {
     // GROUND
-    let geometry = new THREE.PlaneBufferGeometry(100, 100)
-    let planeMaterial = new THREE.MeshPhongMaterial({
-      color: 0xfff5f5
-    })
-    let ground = new THREE.Mesh(geometry, planeMaterial)
-    ground.position.set(0, 0, 0)
-    ground.rotation.x = -Math.PI / 2
-    ground.scale.set(10, 10, 10)
-    ground.castShadow = false
-    ground.receiveShadow = true
-    this.scene.add(ground)
+    this.ground = new SnowGround()
+    this.ground.castShadow = false
+    this.ground.receiveShadow = true
+    this.scene.add(this.ground)
 
     // Cubes
-    let particle = new ParticlesMesh(this.light.position)
+    let particle = new ParticlesMesh(this.light.position, loader.getResult('stripe'))
     particle.position.set(0, -1, 0)
     particle.castShadow = true
     particle.receiveShadow = true
@@ -93,12 +93,12 @@ class App {
     this.particle = particle
 
     // Snow
-    this.snow = new Snow()
+    this.snow = new Snow(loader.getResult('snow'))
     this.scene.add(this.snow)
   }
 
   initDebug() {
-    this.scene.add(new THREE.CameraHelper(this.light.shadow.camera))
+    // this.scene.add(new THREE.CameraHelper(this.light.shadow.camera))
 
     this.stats = new Stats()
     this.stats.domElement.style.position = 'absolute'
@@ -106,20 +106,21 @@ class App {
     document.body.appendChild(this.stats.domElement)
 
 
-    this.tweenTime = 3000
+    this.tweenTime = 1000
     this.gui = new dat.gui.GUI()
-    this.gui.add(this.particle.geometry, 'morphIndex', 0, 3)
-    this.gui.add(this, 'tweenTime', 1000, 10000)
+    this.gui.add(this.particle.geometry, 'morphIndex', 0, 4)
+    this.gui.add(this, 'tweenTime', 500, 10000)
     this.gui.add(this, 'bang')
+    this.gui.add(this.particle.position, 'y', -1.1, 1.1)
   }
 
   bang() {
     let p = {
-      t: 0
+      t: 1
     }
     let tween = new TWEEN.Tween(p)
     tween.to({
-      t: 3.99
+      t: 24.99
     }, this.tweenTime)
     tween.onUpdate(() => {
       this.particle.geometry.morphIndex = p.t
@@ -130,7 +131,7 @@ class App {
     tween.start()
   }
 
-  animate(t) {
+  animate(t = 0) {
     requestAnimationFrame(this.animate)
     TWEEN.update(t)
     this.renderer.clear()
@@ -138,6 +139,7 @@ class App {
     this.controls.update()
     this.snow.update(t)
     this.particle.update(t)
+    this.ground.update(t)
 
     this.renderer.render(this.scene, this.camera)
 
@@ -151,5 +153,9 @@ class App {
   }
 }
 
-new App()
-console.log('%c ❄❆❅ ☃ ❅❆❄ ', 'color:#fff;background:#12293b;font-size:30px;font-weight:bold;')
+// load
+loader.on('complete', () => {
+  new App()
+  console.log('%c ❄❆❅ ☃ ❅❆❄ ', 'color:#fff;background:#12293b;font-size:30px;font-weight:bold;')
+})
+loader.load()

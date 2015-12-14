@@ -67,9 +67,14 @@ class ShadowGeometry extends THREE.Geometry {
     }
 
     // this.fromGeometry(geometry)
-    this.imageToMorph('./textures/frame2.png', this.cubes)
-    this.imageToMorph('./textures/frame3.png', this.cubes)
-    this.imageToMorph('./textures/frame4.png', this.cubes)
+
+    for (let i = 0; i < 24; i++) {
+      this.imageToMorph(`./textures/deer/${i}.png`, this.cubes)
+    }
+
+  // this.imageToMorph('./textures/frame3.png', this.cubes)
+  // this.imageToMorph('./textures/frame4.png', this.cubes)
+  // this.imageToMorph('./textures/frame5.png', this.cubes)
   }
 
   imageToMorph(src, cubes) {
@@ -89,7 +94,7 @@ class ShadowGeometry extends THREE.Geometry {
       for (let i = 0; i < len; i++) {
         let x = (i % SIZE * 2 - SIZE) * 0.05
         let y = (i / SIZE * 2 - SIZE) * 0.05
-        let t = this.get3DTransform(x, y, pixels[i * 4] * 0.01)
+        let t = this.get3DTransform(x, y, pixels[i * 4] * 0.008)
         cubes[i].addMorph(t)
       // console.log(`[${x},${y}] = ${pixels[i * 4]}`)
       }
@@ -136,10 +141,13 @@ class ShadowGeometry extends THREE.Geometry {
 }
 
 export default class ParticlesMesh extends THREE.Mesh {
-  constructor(lightPosition) {
+  constructor(lightPosition, image) {
+    let tex = new THREE.Texture(image)
+    tex.needsUpdate = true
+
     super(new ShadowGeometry(lightPosition),
       new THREE.MeshPhongMaterial({
-        map: THREE.ImageUtils.loadTexture('./textures/stripe.png')
+        map: tex
       })
     )
   }
