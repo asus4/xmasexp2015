@@ -12,10 +12,6 @@ import Snow from './snow'
 import SnowGround from './snow-ground'
 
 
-
-
-document.body.innerHTML = require('./body.jade')()
-
 class App {
   constructor() {
     this.animate = this.animate.bind(this)
@@ -162,8 +158,16 @@ class App {
 }
 
 // load
+const loadingBar = document.getElementById('loading')
+loader.on('progress', (e) => {
+  loadingBar.style.width = `${e.progress * 100}%`
+})
 loader.on('complete', () => {
+  loadingBar.style.transition = 'all 1s'
+  loadingBar.style.width = `100%`
+  loadingBar.style.opacity = 0
   new App()
   console.log('%c ❄❆❅ ☃ ❅❆❄ ', 'color:#fff;background:#12293b;font-size:30px;font-weight:bold;')
 })
 loader.load()
+//document.body.innerHTML = require('./body.jade')()
